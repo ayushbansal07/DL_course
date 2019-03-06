@@ -119,3 +119,4 @@ weights/
 glove/
 *.tsv
 glove.6B.200d.txt
+fasttext/
