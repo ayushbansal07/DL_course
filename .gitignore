@@ -116,3 +116,6 @@ submitable/
 losses/
 ass2_backupfull/
 weights/
+glove/
+*.tsv
+glove.6B.200d.txt
