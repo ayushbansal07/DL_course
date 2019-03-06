@@ -110,3 +110,9 @@ waste/
 others/
 old/
 backup*/
+
+*.png
+submitable/
+losses/
+ass2_backupfull/
+weights/

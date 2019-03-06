@@ -8,8 +8,10 @@ from mxnet import nd, autograd, gluon
 from sklearn.linear_model import LogisticRegression
 import pickle
 
-from utils import DataLoader
+from utils import DataLoader, weights_download
 from networks import network_1, network_2
+
+weights_download()
 
 font = {'family' : 'normal',
         'weight' : 'bold',
@@ -111,6 +113,7 @@ if mode == 'test':
         model = pickle.load(f)
     predictions = model.predict(layer_1_feats)
     acc = np.sum(predictions==test_labels)/len(test_labels)
+
     print("Layer 1 model Acuuracy : ",acc)
 
 

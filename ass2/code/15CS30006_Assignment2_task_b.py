@@ -7,8 +7,11 @@ import matplotlib.pyplot as plt
 from mxnet import nd, autograd, gluon
 import pickle
 
-from utils import DataLoader
+from utils import DataLoader, weights_download
 from networks import network_1, network_2
+from modules import My_NAG, My_SGD
+
+weights_download()
 
 font = {'family' : 'normal',
         'size'   : 22}
@@ -75,7 +78,7 @@ def train(epochs, train_data, train_labels, val_data, val_labels, net, params_fi
         out_val = net(val_data)
         acc.update(preds=nd.argmax(out_val,axis=1),labels=val_labels)
         loss_val.append(softmax_cross_entropy(out_val,val_labels))
-        print("Epoch %d : Loss : %f, Val Accuracy : %f"%(e,nd.sum(loss_all).asscalar(),acc.get()[1]))
+        print("Epoch %d : Loss : %f, Val Accuracy : %f"%(e,nd.mean(loss_all).asscalar(),acc.get()[1]))
         if e > 10 and  abs(last_acc - acc.get()[1]) < 0.00001:
             print("Change in Val accuracy < 0.00001, Training FInished!")
             break
@@ -86,8 +89,8 @@ def train(epochs, train_data, train_labels, val_data, val_labels, net, params_fi
     print("Saving Model....")
     net.save_parameters(os.path.join("weights",params_file+".params"))
 
-    loss_train = [nd.sum(l).asscalar() for l in loss_train]
-    loss_val = [nd.sum(l).asscalar() for l in loss_val]
+    loss_train = [nd.mean(l).asscalar() for l in loss_train]
+    loss_val = [nd.mean(l).asscalar() for l in loss_val]
 
     return loss_train, loss_val
 
@@ -223,7 +226,7 @@ if mode == 'train':
     print("Optimization : SGD")
     net = network_2()
     net.collect_params().initialize(mx.init.Normal(sigma=.1))
-    trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': learning_rate})
+    trainer = gluon.Trainer(net.collect_params(), My_SGD(learning_rate=learning_rate))
     loss_train, loss_val = train(NUM_EPOCHS, train_images, train_labels, val_images, val_labels, net, "network2_exp4_sgd",trainer)
     with open("losses/exp4_sgd_train.list",'wb') as f:
         pickle.dump(loss_train,f)
@@ -235,7 +238,7 @@ if mode == 'train':
     print("Optimization : NAG")
     net = network_2()
     net.collect_params().initialize(mx.init.Normal(sigma=.1))
-    trainer = gluon.Trainer(net.collect_params(), mx.optimizer.NAG(0.9,learning_rate=learning_rate))
+    trainer = gluon.Trainer(net.collect_params(), My_NAG(0.9,learning_rate=learning_rate) )
     loss_train, loss_val = train(NUM_EPOCHS, train_images, train_labels, val_images, val_labels, net, "network2_exp4_nag",trainer)
     with open("losses/exp4_nag_train.list",'wb') as f:
         pickle.dump(loss_train,f)
